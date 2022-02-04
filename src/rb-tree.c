@@ -113,49 +113,122 @@ void rb_insert(rb_tree **root, int val) {
   (*root)->color = BLACK;
 }
 
+void rb_fix_double_black(rb_tree **root, rb_tree *x) {
+  while (x != *root) {
+    rb_tree *sibling = x == x->parent->left ? x->parent->right : x->parent->left;
+    rb_tree *parent = x->parent;
+    if (sibling == NULL) {
+      x = parent;
+      continue;
+    }
+
+    if (sibling->color == RED) {
+      parent->color = RED;
+      sibling->color = BLACK;
+      if (sibling == sibling->parent->left) {
+        rb_rotate_right(root, parent);
+      } else {
+        rb_rotate_left(root, parent);
+      }
+      continue;
+    }
+
+    if ((sibling->left == NULL || sibling->left->color == BLACK) && (sibling->right == NULL || sibling->right->color == BLACK)) {
+      sibling->color = RED;
+      if (parent->color == BLACK) {
+        x = parent;
+        continue;
+      }
+      parent->color = BLACK;
+      break;
+    }
+
+    if (sibling->left && sibling->left->color == RED) {
+      if (sibling == sibling->parent->left) {
+        sibling->left->color = sibling->color;
+        sibling->color = parent->color;
+        rb_rotate_right(root, parent);
+      } else {
+        sibling->left->color = parent->color;
+        rb_rotate_right(root, sibling);
+        rb_rotate_left(root, parent);
+      }
+    } else {
+      if (sibling == sibling->parent->left) {
+        sibling->right->color = sibling->color;
+        rb_rotate_left(root, sibling);
+        rb_rotate_right(root, parent);
+      } else {
+        sibling->right->color = sibling->color;
+        sibling->color = parent->color;
+        rb_rotate_left(root, parent);
+      }
+    }
+    parent->color = BLACK;
+    break;
+  }
+}
+
+void rb_delete_node(rb_tree **root, rb_tree *v) {
+  rb_tree *u = NULL;
+  if (v->left && v->right) {
+    u = v->right;
+    while (u->left != NULL)
+      u = u->left;
+  } else if (v->left || v->right) {
+    u = v->left ? v->left : v->right;
+  }
+
+  if (u && v->left && v->right) {
+    SWAP(v->val, u->val);
+    rb_delete_node(root, u);
+    return;
+  }
+
+  int uv_black = ((u == NULL || u->color == BLACK) && v->color == BLACK);
+  rb_tree *parent = v->parent;
+
+  if (u == NULL) {
+    if (v == *root) {
+      *root = NULL;
+    } else {
+      if (uv_black) {
+        rb_fix_double_black(root, v);
+      } else {
+        rb_tree *sibling = parent->left == v ? parent->right : parent->left;
+        if (sibling)
+          sibling->color = RED;
+      }
+      *(v == parent->left ? &parent->left : &parent->right) = NULL;
+    }
+    free(v);
+    return;
+  }
+
+  if (v == *root) {
+    v->val = u->val;
+    v->left = v->right = NULL;
+    free(u);
+    return;
+  }
+
+  *(v == v->parent->left ? &v->parent->left : &v->parent->right) = u;
+  u->parent = v->parent;
+  if (uv_black) {
+    rb_fix_double_black(root, u);
+  } else {
+    u->color = BLACK;
+  }
+  free(v);
+}
+
 void rb_delete(rb_tree **root, int val) {
   rb_tree **next = root;
   while (*next != NULL && (*next)->val != val)
     next = val < (*next)->val ? &(*next)->left : &(*next)->right;
   if (*next == NULL)
     return;
-
-  // no children
-  if ((*next)->left == NULL && (*next)->right == NULL) {
-    if (*next == *root) {
-      *root = NULL;
-    } else if (*next == (*next)->parent->left) {
-      (*next)->parent->left = NULL;
-    } else {
-      (*next)->parent->right = NULL;
-    }
-    free(*next);
-    return;
-  }
-
-  // one child
-  if ((*next)->left == NULL || (*next)->right == NULL) {
-    rb_tree *child = (*next)->left == NULL ? (*next)->right : (*next)->left;
-    (*next)->val = child->val;
-    (*next)->left = child->left;
-    (*next)->right = child->right;
-    free(child);
-    return;
-  }
-
-  // two children
-  rb_tree *smallest = (*next)->right;
-  while (smallest->left != NULL)
-    smallest = smallest->left;
-
-  if (smallest->parent == *next) {
-    smallest->parent->right = smallest->right;
-  } else {
-    smallest->parent->left = smallest->right;
-  }
-
-  (*next)->val = smallest->val;
-  free(smallest);
+  rb_delete_node(root, *next);
 }
 
 void rb_free(rb_tree **root) {
@@ -178,4 +251,13 @@ int main() {
   rb_insert(&tree, 40);
   rb_insert(&tree, 80);
   print_tree(&tree, 0);
+  rb_delete(&tree, 8);
+  rb_delete(&tree, 18);
+  rb_delete(&tree, 5);
+  rb_delete(&tree, 15);
+  rb_delete(&tree, 17);
+  rb_delete(&tree, 25);
+  rb_delete(&tree, 40);
+  rb_delete(&tree, 80);
+  rb_free(&tree);
 }
