@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include "rb-tree.h"
 
 #define BLACK 0
 #define RED   1
@@ -11,13 +12,7 @@
   y = tmp;             \
 } while (0)
 
-typedef struct rb_tree {
-  int val;
-  char color;
-  struct rb_tree *left, *right, *parent;
-} rb_tree;
-
-void print_tree(rb_tree **root, int d) {
+static void _rb_print(rb_tree **root, int d) {
   printf("%*s", d*2, "");
   if (*root == NULL) {
     printf("nil B\n");
@@ -25,12 +20,12 @@ void print_tree(rb_tree **root, int d) {
   }
   printf("%d %c\n",(*root)->val, (*root)->color == BLACK ? 'B' : 'R');
   if ((*root)->left || (*root)->right) {
-    print_tree(&(*root)->left, d+1);
-    print_tree(&(*root)->right, d+1);
+    _rb_print(&(*root)->left, d+1);
+    _rb_print(&(*root)->right, d+1);
   }
 }
 
-void rb_rotate_left(rb_tree **root, rb_tree *x) {
+static void rb_rotate_left(rb_tree **root, rb_tree *x) {
   rb_tree *y = x->right;
   x->right = y->left;
   if (y->left)
@@ -47,7 +42,7 @@ void rb_rotate_left(rb_tree **root, rb_tree *x) {
   x->parent = y;
 }
 
-void rb_rotate_right(rb_tree **root, rb_tree *x) {
+static void rb_rotate_right(rb_tree **root, rb_tree *x) {
   rb_tree *y = x->left;
   x->left = y->right;
   if (y->right)
@@ -64,7 +59,7 @@ void rb_rotate_right(rb_tree **root, rb_tree *x) {
   x->parent = y;
 }
 
-void rb_insert_fix(rb_tree **root, rb_tree *node) {
+static void rb_insert_fix(rb_tree **root, rb_tree *node) {
   while (node != *root && node->parent->color == RED) {
     rb_tree *grandparent = node->parent->parent;
     rb_tree *uncle = grandparent->left == node->parent ? grandparent->right : grandparent->left;
@@ -92,28 +87,7 @@ void rb_insert_fix(rb_tree **root, rb_tree *node) {
   }
 }
 
-int rb_contains(rb_tree **root, int val) {
-  rb_tree **next = root;
-  while (*next != NULL && (*next)->val != val)
-    next = val < (*next)->val ? &(*next)->left : &(*next)->right;
-  return *next != NULL;
-}
-
-void rb_insert(rb_tree **root, int val) {
-  rb_tree **next = root, *parent = NULL;
-  while (*next != NULL && (*next)->val != val) {
-    parent = *next;
-    next = val < (*next)->val ? &(*next)->left : &(*next)->right;
-  }
-  if (*next != NULL)
-    return;
-  *next = malloc(sizeof(rb_tree));
-  **next = (rb_tree) { .val = val, .color = RED, .parent = parent };
-  rb_insert_fix(root, *next);
-  (*root)->color = BLACK;
-}
-
-void rb_fix_double_black(rb_tree **root, rb_tree *x) {
+static void rb_fix_double_black(rb_tree **root, rb_tree *x) {
   while (x != *root) {
     rb_tree *sibling = x == x->parent->left ? x->parent->right : x->parent->left;
     rb_tree *parent = x->parent;
@@ -169,7 +143,7 @@ void rb_fix_double_black(rb_tree **root, rb_tree *x) {
   }
 }
 
-void rb_delete_node(rb_tree **root, rb_tree *v) {
+static void rb_delete_node(rb_tree **root, rb_tree *v) {
   rb_tree *u = NULL;
   if (v->left && v->right) {
     u = v->right;
@@ -222,6 +196,29 @@ void rb_delete_node(rb_tree **root, rb_tree *v) {
   free(v);
 }
 
+void rb_print(rb_tree **root) { _rb_print(root, 0); }
+
+int rb_contains(rb_tree **root, int val) {
+  rb_tree **next = root;
+  while (*next != NULL && (*next)->val != val)
+    next = val < (*next)->val ? &(*next)->left : &(*next)->right;
+  return *next != NULL;
+}
+
+void rb_insert(rb_tree **root, int val) {
+  rb_tree **next = root, *parent = NULL;
+  while (*next != NULL && (*next)->val != val) {
+    parent = *next;
+    next = val < (*next)->val ? &(*next)->left : &(*next)->right;
+  }
+  if (*next != NULL)
+    return;
+  *next = malloc(sizeof(rb_tree));
+  **next = (rb_tree) { .val = val, .color = RED, .parent = parent };
+  rb_insert_fix(root, *next);
+  (*root)->color = BLACK;
+}
+
 void rb_delete(rb_tree **root, int val) {
   rb_tree **next = root;
   while (*next != NULL && (*next)->val != val)
@@ -250,7 +247,7 @@ int main() {
   rb_insert(&tree, 25);
   rb_insert(&tree, 40);
   rb_insert(&tree, 80);
-  print_tree(&tree, 0);
+  rb_print(&tree);
   rb_delete(&tree, 8);
   rb_delete(&tree, 18);
   rb_delete(&tree, 5);
