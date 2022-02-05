@@ -87,55 +87,54 @@ static void rb_insert_fix(rb_tree **root, rb_tree *node) {
 static void rb_fix_double_black(rb_tree **root, rb_tree *x) {
   while (x != *root) {
     rb_tree *sibling = x == x->parent->left ? x->parent->right : x->parent->left;
-    rb_tree *parent = x->parent;
     if (sibling == NULL) {
-      x = parent;
+      x = x->parent;
       continue;
     }
 
     if (sibling->color == RED) {
-      parent->color = RED;
+      x->parent->color = RED;
       sibling->color = BLACK;
       if (sibling == sibling->parent->left) {
-        rb_rotate_right(root, parent);
+        rb_rotate_right(root, x->parent);
       } else {
-        rb_rotate_left(root, parent);
+        rb_rotate_left(root, x->parent);
       }
-      continue;
+      sibling = x == x->parent->left ? x->parent->right : x->parent->left;
     }
 
     if ((sibling->left == NULL || sibling->left->color == BLACK) && (sibling->right == NULL || sibling->right->color == BLACK)) {
       sibling->color = RED;
-      if (parent->color == BLACK) {
-        x = parent;
+      if (x->parent->color == BLACK) {
+        x = x->parent;
         continue;
       }
-      parent->color = BLACK;
+      x->parent->color = BLACK;
       break;
     }
 
     if (sibling->left && sibling->left->color == RED) {
       if (sibling == sibling->parent->left) {
         sibling->left->color = sibling->color;
-        sibling->color = parent->color;
-        rb_rotate_right(root, parent);
+        sibling->color = x->parent->color;
+        rb_rotate_right(root, x->parent);
       } else {
-        sibling->left->color = parent->color;
+        sibling->left->color = x->parent->color;
         rb_rotate_right(root, sibling);
-        rb_rotate_left(root, parent);
+        rb_rotate_left(root, x->parent);
       }
     } else {
       if (sibling == sibling->parent->left) {
-        sibling->right->color = sibling->color;
+        sibling->right->color = x->parent->color;
         rb_rotate_left(root, sibling);
-        rb_rotate_right(root, parent);
+        rb_rotate_right(root, x->parent);
       } else {
         sibling->right->color = sibling->color;
-        sibling->color = parent->color;
-        rb_rotate_left(root, parent);
+        sibling->color = x->parent->color;
+        rb_rotate_left(root, x->parent);
       }
     }
-    parent->color = BLACK;
+    x->parent->color = BLACK;
     break;
   }
 }
