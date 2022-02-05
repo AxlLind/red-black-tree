@@ -201,27 +201,29 @@ int rb_contains(rb_tree **root, int val) {
   return *next != NULL;
 }
 
-void rb_insert(rb_tree **root, int val) {
+int rb_insert(rb_tree **root, int val) {
   rb_tree **next = root, *parent = NULL;
   while (*next != NULL && (*next)->val != val) {
     parent = *next;
     next = val < (*next)->val ? &(*next)->left : &(*next)->right;
   }
   if (*next != NULL)
-    return;
+    return 0;
   *next = malloc(sizeof(rb_tree));
   **next = (rb_tree) { .val = val, .color = RED, .parent = parent };
   rb_insert_fix(root, *next);
   (*root)->color = BLACK;
+  return 1;
 }
 
-void rb_delete(rb_tree **root, int val) {
+int rb_delete(rb_tree **root, int val) {
   rb_tree **next = root;
   while (*next != NULL && (*next)->val != val)
     next = val < (*next)->val ? &(*next)->left : &(*next)->right;
   if (*next == NULL)
-    return;
+    return 0;
   rb_delete_node(root, *next);
+  return 1;
 }
 
 void rb_free(rb_tree **root) {

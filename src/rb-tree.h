@@ -21,14 +21,16 @@ int rb_contains(rb_tree **root, int val);
 /** @brief Insert a value into the tree.
  *  @param root The root node of the tree.
  *  @param val The value to insert.
+ *  @return 0 if the tree already contained the value, 1 otherwise.
  */
-void rb_insert(rb_tree **root, int val);
+int rb_insert(rb_tree **root, int val);
 
 /** @brief Delete a value from the tree.
  *  @param root The root node of the tree.
  *  @param val The value to delete.
+ *  @return 0 if the tree did not contain the value, 1 otherwise.
  */
-void rb_delete(rb_tree **root, int val);
+int rb_delete(rb_tree **root, int val);
 
 /** @brief Free the tree, i.e free the memory.
  *  @param root The root node of the tree.
