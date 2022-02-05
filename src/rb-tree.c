@@ -233,4 +233,8 @@ void rb_free(rb_tree **root) {
   *root = NULL;
 }
 
+int rb_size(rb_tree **root) {
+  if (*root == NULL)
+    return 0;
+  return 1 + rb_size(&(*root)->left) + rb_size(&(*root)->right);
 }

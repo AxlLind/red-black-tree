@@ -40,4 +40,10 @@ void rb_free(rb_tree **root);
  */
 void rb_print(rb_tree **root);
 
+/** @brief Returns the size of the tree.
+ *  @param root The root node of the tree.
+ *  @return The size of the tree.
+ */
+int rb_size(rb_tree **root);
+
 #endif // RB_TREE_H
