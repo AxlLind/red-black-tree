@@ -3,9 +3,6 @@
 #include <assert.h>
 #include "rb-tree.h"
 
-#define BLACK 0
-#define RED   1
-
 #define SWAP(x,y) do { \
   typeof(x) tmp = x;   \
   x = y;               \
@@ -237,24 +234,4 @@ void rb_free(rb_tree **root) {
   *root = NULL;
 }
 
-int main() {
-  rb_tree *tree = NULL;
-  rb_insert(&tree, 8);
-  rb_insert(&tree, 18);
-  rb_insert(&tree, 5);
-  rb_insert(&tree, 15);
-  rb_insert(&tree, 17);
-  rb_insert(&tree, 25);
-  rb_insert(&tree, 40);
-  rb_insert(&tree, 80);
-  rb_print(&tree);
-  rb_delete(&tree, 8);
-  rb_delete(&tree, 18);
-  rb_delete(&tree, 5);
-  rb_delete(&tree, 15);
-  rb_delete(&tree, 17);
-  rb_delete(&tree, 25);
-  rb_delete(&tree, 40);
-  rb_delete(&tree, 80);
-  rb_free(&tree);
 }

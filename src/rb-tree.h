@@ -1,6 +1,9 @@
 #ifndef RB_TREE_H
 #define RB_TREE_H
 
+#define BLACK 0
+#define RED   1
+
 /** @brief A red-black tree struct */
 typedef struct rb_tree {
   int val;
