@@ -1,3 +1,4 @@
+TARGETS   := fuzz example
 SRC_DIR   := src
 BUILD_DIR := build
 
@@ -6,15 +7,16 @@ CPPFLAGS      := -I$(SRC_DIR)
 CFLAGS        := -g -Wall -Wextra -Wpedantic -Wshadow -Werror -O3
 VALGRINDFLAGS := --leak-check=full --show-leak-kinds=all --track-origins=yes
 
-.PHONY: fuzz clean
+.PRECIOUS: $(BUILD_DIR)/%.o
+.PHONY: $(TARGETS) $(TARGETS:%=%-valgrind) clean
 
-fuzz: $(BUILD_DIR)/fuzz
-	./$(BUILD_DIR)/fuzz
+$(TARGETS): % : $(BUILD_DIR)/%
+	./$(BUILD_DIR)/$@
 
-fuzz-valgrind: $(BUILD_DIR)/fuzz
-	 valgrind $(VALGRINDFLAGS) ./$(BUILD_DIR)/fuzz 10000
+$(TARGETS:%=%-valgrind): %-valgrind : $(BUILD_DIR)/%
+	valgrind $(VALGRINDFLAGS) ./$(BUILD_DIR)/$*
 
-$(BUILD_DIR)/fuzz: $(BUILD_DIR)/rb-tree.o $(BUILD_DIR)/fuzz.o
+$(BUILD_DIR)/%: $(BUILD_DIR)/rb-tree.o $(BUILD_DIR)/%.o
 	$(CC) $^ -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
