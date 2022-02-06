@@ -7,10 +7,10 @@ int verify_tree(rb_tree *node) {
   if (node == NULL)
     return 1;
 
-  if (node->color == RED) {
-    if (node->left && node->left->color == RED)
+  if (node->color == rb_RED) {
+    if (node->left && node->left->color == rb_RED)
       return 0;
-    if (node->right && node->right->color == RED)
+    if (node->right && node->right->color == rb_RED)
       return 0;
   }
 
@@ -24,11 +24,11 @@ int verify_tree(rb_tree *node) {
 
   if (left_black_height != right_black_height)
     return 0;
-  return left_black_height + (node->color == BLACK);
+  return left_black_height + (node->color == rb_BLACK);
 }
 
 int valid_rb_tree(rb_tree **root) {
-  if (*root && (*root)->color != BLACK)
+  if (*root && (*root)->color != rb_BLACK)
     return 0;
   return verify_tree(*root) != 0;
 }

@@ -1,13 +1,13 @@
 #ifndef RB_TREE_H
 #define RB_TREE_H
 
-#define BLACK 0
-#define RED   1
+/** @brief Enum of rb-tree colors */
+enum rb_color { rb_BLACK, rb_RED };
 
 /** @brief A red-black tree struct */
 typedef struct rb_tree {
   int val;
-  char color;
+  enum rb_color color;
   struct rb_tree *left, *right, *parent;
 } rb_tree;
 

@@ -15,7 +15,7 @@ static void _rb_print(rb_tree **root, int d) {
     printf("nil B\n");
     return;
   }
-  printf("%d %c\n",(*root)->val, (*root)->color == BLACK ? 'B' : 'R');
+  printf("%d %c\n",(*root)->val, (*root)->color == rb_BLACK ? 'B' : 'R');
   if ((*root)->left || (*root)->right) {
     _rb_print(&(*root)->left, d+1);
     _rb_print(&(*root)->right, d+1);
@@ -57,13 +57,13 @@ static void rb_rotate_right(rb_tree **root, rb_tree *x) {
 }
 
 static void rb_insert_fix(rb_tree **root, rb_tree *node) {
-  while (node != *root && node->parent->color == RED) {
+  while (node != *root && node->parent->color == rb_RED) {
     rb_tree *grandparent = node->parent->parent;
     rb_tree *uncle = grandparent->left == node->parent ? grandparent->right : grandparent->left;
-    if (uncle && uncle->color == RED) {
-      uncle->color = BLACK;
-      node->parent->color = BLACK;
-      grandparent->color = RED;
+    if (uncle && uncle->color == rb_RED) {
+      uncle->color = rb_BLACK;
+      node->parent->color = rb_BLACK;
+      grandparent->color = rb_RED;
       node = grandparent;
       continue;
     }
@@ -92,9 +92,9 @@ static void rb_fix_double_black(rb_tree **root, rb_tree *x) {
       continue;
     }
 
-    if (sibling->color == RED) {
-      x->parent->color = RED;
-      sibling->color = BLACK;
+    if (sibling->color == rb_RED) {
+      x->parent->color = rb_RED;
+      sibling->color = rb_BLACK;
       if (sibling == sibling->parent->left) {
         rb_rotate_right(root, x->parent);
       } else {
@@ -103,17 +103,17 @@ static void rb_fix_double_black(rb_tree **root, rb_tree *x) {
       sibling = x == x->parent->left ? x->parent->right : x->parent->left;
     }
 
-    if ((sibling->left == NULL || sibling->left->color == BLACK) && (sibling->right == NULL || sibling->right->color == BLACK)) {
-      sibling->color = RED;
-      if (x->parent->color == BLACK) {
+    if ((sibling->left == NULL || sibling->left->color == rb_BLACK) && (sibling->right == NULL || sibling->right->color == rb_BLACK)) {
+      sibling->color = rb_RED;
+      if (x->parent->color == rb_BLACK) {
         x = x->parent;
         continue;
       }
-      x->parent->color = BLACK;
+      x->parent->color = rb_BLACK;
       break;
     }
 
-    if (sibling->left && sibling->left->color == RED) {
+    if (sibling->left && sibling->left->color == rb_RED) {
       if (sibling == sibling->parent->left) {
         sibling->left->color = sibling->color;
         sibling->color = x->parent->color;
@@ -134,7 +134,7 @@ static void rb_fix_double_black(rb_tree **root, rb_tree *x) {
         rb_rotate_left(root, x->parent);
       }
     }
-    x->parent->color = BLACK;
+    x->parent->color = rb_BLACK;
     break;
   }
 }
@@ -155,7 +155,7 @@ static void rb_delete_node(rb_tree **root, rb_tree *v) {
     return;
   }
 
-  int uv_black = ((u == NULL || u->color == BLACK) && v->color == BLACK);
+  int uv_black = ((u == NULL || u->color == rb_BLACK) && v->color == rb_BLACK);
   rb_tree *parent = v->parent;
 
   if (u == NULL) {
@@ -167,7 +167,7 @@ static void rb_delete_node(rb_tree **root, rb_tree *v) {
       } else {
         rb_tree *sibling = parent->left == v ? parent->right : parent->left;
         if (sibling)
-          sibling->color = RED;
+          sibling->color = rb_RED;
       }
       *(v == parent->left ? &parent->left : &parent->right) = NULL;
     }
@@ -187,7 +187,7 @@ static void rb_delete_node(rb_tree **root, rb_tree *v) {
   if (uv_black) {
     rb_fix_double_black(root, u);
   } else {
-    u->color = BLACK;
+    u->color = rb_BLACK;
   }
   free(v);
 }
@@ -210,9 +210,9 @@ int rb_insert(rb_tree **root, int val) {
   if (*next != NULL)
     return 0;
   *next = malloc(sizeof(rb_tree));
-  **next = (rb_tree) { .val = val, .color = RED, .parent = parent };
+  **next = (rb_tree) { .val = val, .color = rb_RED, .parent = parent };
   rb_insert_fix(root, *next);
-  (*root)->color = BLACK;
+  (*root)->color = rb_BLACK;
   return 1;
 }
 
