@@ -60,4 +60,5 @@ int main(int argc, char *argv[]) {
   }
   printf("[passed] RB-tree valid after %d iterations.\n", iters);
   printf("         tree size %d, %d insertions, %d deletions\n", rb_size(&tree), insertions, deletions);
+  rb_free(&tree);
 }
