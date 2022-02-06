@@ -1,7 +1,17 @@
 # red-black-tree
-This repo contains an implementation of the classic datastructure `red-black tree` implemented in C. An rb-tree is a self-balancing binary search tree, providing `O(log n)` time complexity of the primary operations `lookup, insert, delete`.
+This repo contains an implementation of the classic datastructure `red-black tree` implemented in C. An rb-tree is a self-balancing binary search tree, providing `O(log n)` time complexity of the primary operations search, insert, and delete.
 
 Note that this implementation is a set, e.g it does not allow duplicate values.
+
+## Testing strategy
+For this project, I wanted to test the feasability of fuzz-testing instead of writing manual test cases. The fuzz-test works as follows:
+- Perform a random operation of insert or delete with a random value.
+- Verify that all red-black properties still hold.
+- Repeat.
+
+This is implemented in [fuzz.c](./src/fuzz.c). The test has ran successfully for **1 billion** operations, which took over an hour on my machine. Given the amount of operations, you can be reasonably certain that every possible scenario of insertion and deletion has been tested. This gives you an exhaustive test.
+
+The downside of this approach is for one the test time, however this only has to be done once. Second, it relies on a correct implementation of step 2: verifying all red-black properties of the tree. However, implementing this is orders of magnitude easier than the red-black tree itself. Verifying that this function is correct is not difficult.
 
 ## Usage
 ```bash
