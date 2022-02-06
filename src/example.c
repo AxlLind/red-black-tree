@@ -24,6 +24,5 @@ int main(void) {
 
   rb_free(&tree);
 
-  // rb_free sets the root pointer to NULL
-  assert(tree == NULL);
+  assert(tree == NULL); // rb_free sets the root pointer to NULL
 }

@@ -31,8 +31,7 @@ assert(rb_size(&tree) == 2); // only contains 30, 40
 
 rb_free(&tree);
 
-// rb_free sets the root pointer to NULL
-assert(tree == NULL);
+assert(tree == NULL); // rb_free sets the root pointer to NULL
 ```
 
 ## Testing strategy

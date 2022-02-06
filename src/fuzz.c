@@ -14,17 +14,16 @@ int verify_tree(rb_tree *node) {
       return 0;
   }
 
-  int left_black_height = verify_tree(node->left);
-  if (left_black_height == 0)
-    return left_black_height;
+  int l_black_height = verify_tree(node->left);
+  if (l_black_height == 0)
+    return l_black_height;
+  int r_black_height = verify_tree(node->right);
+  if (r_black_height == 0)
+    return r_black_height;
 
-  int right_black_height = verify_tree(node->right);
-  if (right_black_height == 0)
-    return right_black_height;
-
-  if (left_black_height != right_black_height)
+  if (l_black_height != r_black_height)
     return 0;
-  return left_black_height + (node->color == rb_BLACK);
+  return l_black_height + (node->color == rb_BLACK);
 }
 
 int valid_rb_tree(rb_tree **root) {
@@ -34,22 +33,19 @@ int valid_rb_tree(rb_tree **root) {
 }
 
 int main(int argc, char *argv[]) {
-  int iters = 100000;
-  if (argc == 2)
-    sscanf(argv[1], "%d", &iters);
-  printf("Running fuzz test with %d operations.\n", iters);
   srand(time(NULL));
+  int ops = 10000, insertions = 0, deletions = 0;
+  if (argc == 2)
+    sscanf(argv[1], "%d", &ops);
+  printf("Running fuzz test with %d operations.\n", ops);
   rb_tree *tree = NULL;
-  int insertions = 0, deletions = 0;
-  for (int i = 0; i < iters; i++) {
+  for (int i = 0; i < ops; i++) {
     int n = rand() >> 16;
-    int type = n & 1;
-    int val = n >> 1;
-    if (type) {
-      rb_insert(&tree, val);
+    if (n & 1) {
+      rb_insert(&tree, n >> 1);
       ++insertions;
     } else {
-      rb_delete(&tree, val);
+      rb_delete(&tree, n >> 1);
       ++deletions;
     }
     if (!valid_rb_tree(&tree)) {
@@ -58,7 +54,7 @@ int main(int argc, char *argv[]) {
       return 1;
     }
   }
-  printf("[passed] RB-tree valid after %d iterations.\n", iters);
-  printf("         tree size %d, %d insertions, %d deletions\n", rb_size(&tree), insertions, deletions);
+  printf("[passed] RB-tree valid after %d operations!\n", ops);
+  printf("         size=%d, insertions=%d, deletions=%d\n", rb_size(&tree), insertions, deletions);
   rb_free(&tree);
 }
