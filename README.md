@@ -3,6 +3,14 @@ This repo contains an implementation of the classic datastructure `red-black tre
 
 Note that this implementation is a set, e.g it does not allow duplicate values.
 
+## Usage
+```bash
+make build/rb-tree.o  # compile the lib into an object file
+make fuzz             # compile and run the fuzz test
+make fuzz-valgrind    # run memory-safety check
+./build/fuzz 1000     # run the fuzz test with 1000 operations
+```
+
 ## Testing strategy
 For this project, I wanted to test the feasability of fuzz-testing instead of writing manual test cases. The fuzz-test works as follows:
 - Perform a random operation of insert or delete with a random value.
@@ -13,12 +21,7 @@ This is implemented in [fuzz.c](./src/fuzz.c). The test has ran successfully for
 
 The downside of this approach is for one the test time, however this only has to be done once. Second, it relies on a correct implementation of step 2: verifying all red-black properties of the tree. However, implementing this is orders of magnitude easier than the red-black tree itself. Verifying that this function is correct is not difficult.
 
-## Usage
-```bash
-make build/rb-tree.o # compile the lib into an object file
-make fuzz            # compile and run the fuzz test
-./build/fuzz 1000    # run the fuzz test with 1000 operations
-```
+Regarding memory-safety, valgrind reports no errors when running the fuzz test.
 
 ## API
 See the header file [rb-tree.h](./src/rb-tree.h) for the full API.
