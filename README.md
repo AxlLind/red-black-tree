@@ -21,9 +21,7 @@ rb_insert(&tree, 20);
 rb_insert(&tree, 40);
 rb_insert(&tree, 40); // returns 0 since the tree already contains the value
 
-if (rb_contains(&tree, 30)) {
-  // do something
-}
+assert(rb_contains(&tree, 30));
 
 rb_delete(&tree, 50);
 rb_delete(&tree, 20);
