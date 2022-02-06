@@ -13,8 +13,6 @@ make fuzz-valgrind    # run memory-safety check
 ## API
 See the header file [rb-tree.h](./src/rb-tree.h) for the full API. Initialize and use the tree like so:
 ```c
-#include "rb-tree.h"
-
 rb_tree *tree = NULL; // define an empty tree
 
 rb_insert(&tree, 50);
