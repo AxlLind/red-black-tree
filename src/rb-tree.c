@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <assert.h>
 #include "rb-tree.h"
 
 #define SWAP(x,y) do { \
