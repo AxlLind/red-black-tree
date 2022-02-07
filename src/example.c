@@ -14,13 +14,13 @@ int main(void) {
   rb_insert(&tree, 40);
   rb_insert(&tree, 40); // returns 0 since the tree already contains the value
 
-  assert(rb_contains(&tree, 30));
+  assert(rb_contains(tree, 30));
 
   rb_delete(&tree, 50);
   rb_delete(&tree, 20);
   rb_delete(&tree, 10); // returns 0 since the tree did not contain the value
 
-  assert(rb_size(&tree) == 2); // only contains 30, 40
+  assert(rb_size(tree) == 2); // only contains 30, 40
 
   rb_free(&tree);
 

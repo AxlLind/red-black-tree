@@ -26,10 +26,10 @@ int verify_tree(rb_tree *node) {
   return l_black_height + (node->color == rb_BLACK);
 }
 
-int valid_rb_tree(rb_tree **root) {
-  if (*root && (*root)->color != rb_BLACK)
+int valid_rb_tree(rb_tree *root) {
+  if (root && root->color != rb_BLACK)
     return 0;
-  return verify_tree(*root) != 0;
+  return verify_tree(root) != 0;
 }
 
 int main(int argc, char *argv[]) {
@@ -48,13 +48,13 @@ int main(int argc, char *argv[]) {
       rb_delete(&tree, n >> 1);
       ++deletions;
     }
-    if (!valid_rb_tree(&tree)) {
+    if (!valid_rb_tree(tree)) {
       printf("[failed] Invalid tree!");
-      rb_print(&tree);
+      rb_print(tree);
       return 1;
     }
   }
   printf("[passed] RB-tree valid after %d operations!\n", ops);
-  printf("         size=%d, insertions=%d, deletions=%d\n", rb_size(&tree), insertions, deletions);
+  printf("         size=%d, insertions=%d, deletions=%d\n", rb_size(tree), insertions, deletions);
   rb_free(&tree);
 }

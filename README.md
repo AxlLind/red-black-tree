@@ -11,7 +11,7 @@ make fuzz-valgrind    # run memory-safety check
 ./build/fuzz 1000     # run the fuzz test with 1000 operations
 ```
 ## API
-See the header file [rb-tree.h](./src/rb-tree.h) for the full API. Initialize and use the tree like so:
+See the header file [rb-tree.h](./src/rb-tree.h) for the full API. Note that functions that mutate the tree take a double pointer (`rb_tree**`). Initialize and use the tree like so:
 ```c
 rb_tree *tree = NULL; // define an empty tree
 
@@ -21,13 +21,13 @@ rb_insert(&tree, 20);
 rb_insert(&tree, 40);
 rb_insert(&tree, 40); // returns 0 since the tree already contains the value
 
-assert(rb_contains(&tree, 30));
+assert(rb_contains(tree, 30));
 
 rb_delete(&tree, 50);
 rb_delete(&tree, 20);
 rb_delete(&tree, 10); // returns 0 since the tree did not contain the value
 
-assert(rb_size(&tree) == 2); // only contains 30, 40
+assert(rb_size(tree) == 2); // only contains 30, 40
 
 rb_free(&tree);
 

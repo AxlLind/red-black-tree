@@ -9,16 +9,16 @@
   y = tmp;             \
 } while (0)
 
-static void _rb_print(rb_tree **root, int d) {
+static void _rb_print(rb_tree *root, int d) {
   printf("%*s", d*2, "");
-  if (*root == NULL) {
+  if (root == NULL) {
     printf("nil B\n");
     return;
   }
-  printf("%d %c\n",(*root)->val, (*root)->color == rb_BLACK ? 'B' : 'R');
-  if ((*root)->left || (*root)->right) {
-    _rb_print(&(*root)->left, d+1);
-    _rb_print(&(*root)->right, d+1);
+  printf("%d %c\n",root->val, root->color == rb_BLACK ? 'B' : 'R');
+  if (root->left || root->right) {
+    _rb_print(root->left, d+1);
+    _rb_print(root->right, d+1);
   }
 }
 
@@ -192,13 +192,13 @@ static void rb_delete_node(rb_tree **root, rb_tree *v) {
   free(v);
 }
 
-void rb_print(rb_tree **root) { _rb_print(root, 0); }
+void rb_print(rb_tree *root) { _rb_print(root, 0); }
 
-int rb_contains(rb_tree **root, int val) {
-  rb_tree **next = root;
-  while (*next != NULL && (*next)->val != val)
-    next = val < (*next)->val ? &(*next)->left : &(*next)->right;
-  return *next != NULL;
+int rb_contains(rb_tree *root, int val) {
+  rb_tree *next = root;
+  while (next != NULL && next->val != val)
+    next = val < next->val ? next->left : next->right;
+  return next != NULL;
 }
 
 int rb_insert(rb_tree **root, int val) {
@@ -235,8 +235,8 @@ void rb_free(rb_tree **root) {
   *root = NULL;
 }
 
-int rb_size(rb_tree **root) {
-  if (*root == NULL)
+int rb_size(rb_tree *root) {
+  if (root == NULL)
     return 0;
-  return 1 + rb_size(&(*root)->left) + rb_size(&(*root)->right);
+  return 1 + rb_size(root->left) + rb_size(root->right);
 }
