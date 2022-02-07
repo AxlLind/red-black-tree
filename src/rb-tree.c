@@ -139,59 +139,6 @@ static void rb_fix_double_black(rb_tree **root, rb_tree *x) {
   }
 }
 
-static void rb_delete_node(rb_tree **root, rb_tree *v) {
-  rb_tree *u = NULL;
-  if (v->left && v->right) {
-    u = v->right;
-    while (u->left != NULL)
-      u = u->left;
-  } else if (v->left || v->right) {
-    u = v->left ? v->left : v->right;
-  }
-
-  if (u && v->left && v->right) {
-    SWAP(v->val, u->val);
-    rb_delete_node(root, u);
-    return;
-  }
-
-  int uv_black = ((u == NULL || u->color == rb_BLACK) && v->color == rb_BLACK);
-  rb_tree *parent = v->parent;
-
-  if (u == NULL) {
-    if (v == *root) {
-      *root = NULL;
-    } else {
-      if (uv_black) {
-        rb_fix_double_black(root, v);
-      } else {
-        rb_tree *sibling = parent->left == v ? parent->right : parent->left;
-        if (sibling)
-          sibling->color = rb_RED;
-      }
-      *(v == parent->left ? &parent->left : &parent->right) = NULL;
-    }
-    free(v);
-    return;
-  }
-
-  if (v == *root) {
-    v->val = u->val;
-    v->left = v->right = NULL;
-    free(u);
-    return;
-  }
-
-  *(v == v->parent->left ? &v->parent->left : &v->parent->right) = u;
-  u->parent = v->parent;
-  if (uv_black) {
-    rb_fix_double_black(root, u);
-  } else {
-    u->color = rb_BLACK;
-  }
-  free(v);
-}
-
 void rb_print(rb_tree *root) { _rb_print(root, 0); }
 
 int rb_contains(rb_tree *root, int val) {
@@ -218,11 +165,59 @@ int rb_insert(rb_tree **root, int val) {
 
 int rb_delete(rb_tree **root, int val) {
   rb_tree **next = root;
-  while (*next != NULL && (*next)->val != val)
+  while (*next && (*next)->val != val)
     next = val < (*next)->val ? &(*next)->left : &(*next)->right;
   if (*next == NULL)
     return 0;
-  rb_delete_node(root, *next);
+
+  rb_tree *v = *next, *u = NULL;
+  do {
+    u = NULL;
+    if (v->left && v->right) {
+      u = v->right;
+      for (u = v->right; u->left;)
+        u = u->left;
+    } else if (v->left || v->right) {
+      u = v->left ? v->left : v->right;
+    }
+
+    if (!u || !v->left || !v->right)
+      break;
+
+    SWAP(v->val, u->val);
+    v = u;
+  } while (1);
+
+  int uv_black = ((u == NULL || u->color == rb_BLACK) && v->color == rb_BLACK);
+  rb_tree *parent = v->parent;
+
+  if (v == *root) {
+    if (u) {
+      v->val = u->val;
+      v->left = v->right = NULL;
+      v = u;
+    } else {
+      *root = NULL;
+    }
+  } else if (u) {
+    *(v == v->parent->left ? &v->parent->left : &v->parent->right) = u;
+    u->parent = v->parent;
+    if (uv_black) {
+      rb_fix_double_black(root, u);
+    } else {
+      u->color = rb_BLACK;
+    }
+  } else {
+    if (uv_black) {
+      rb_fix_double_black(root, v);
+    } else {
+      rb_tree *sibling = parent->left == v ? parent->right : parent->left;
+      if (sibling)
+        sibling->color = rb_RED;
+    }
+    *(v == parent->left ? &parent->left : &parent->right) = NULL;
+  }
+  free(v);
   return 1;
 }
 
