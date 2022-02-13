@@ -13,7 +13,7 @@ $(TARGETS:%=%-valgrind): %-valgrind : build/%
 	valgrind $(VALGRINDFLAGS) ./build/$*
 
 build/%: build/rb-tree.o build/%.o
-	$(CC) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 build/%.o: src/%.c | build
 	$(CC) $(CFLAGS) -c $< -o $@
